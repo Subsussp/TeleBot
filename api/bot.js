@@ -1,7 +1,7 @@
 // api/bot.js
 const axios = require('axios');
 const mongoose = require('mongoose');
-const Message = require('../models/Message');
+const Message = require('../message.js');
 const { getSeparated, postpoll } = require('../controls/utills');
 
 // MongoDB connection

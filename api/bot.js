@@ -36,7 +36,7 @@ async function processQueue() {
 
 module.exports = async (req, res) => {
   let obj = req.body;
-  processQueue();
+  await processQueue();
   if (obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && ['SofaAwAs', 'YoussefE16', 'YMYquestions'].includes(req.body.message.from.username) && obj.message.chat.type === 'private') {
     messageQueue.push(obj);
     await processQueue();

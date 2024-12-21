@@ -28,7 +28,7 @@ async function processQueue() {
       await new Promise(resolve => setTimeout(async () => {
         await postpoll(questions[i], answers[i]);
         resolve();
-      }, 2000));
+      }, 3000));
     }
   }
   isProcessing = false;

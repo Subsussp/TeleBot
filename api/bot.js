@@ -3,6 +3,7 @@ const axios = require('axios');
 const mongoose = require('mongoose');
 const Message = require('../message.js');
 const { getSeparated, postpoll } = require('../controls/utills');
+require('dotenv').config()
 mongoose.set('strictQuery', true);  // or true depending on your preference
 
 // MongoDB connection

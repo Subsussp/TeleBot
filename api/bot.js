@@ -1,4 +1,4 @@
-const { getSeparated, postpoll } = require('./controls/utills');
+const { getSeparated, postpoll } = require('../controls/utills');
 
 let messageQueue = [];
 let numbers;

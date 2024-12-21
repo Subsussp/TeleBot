@@ -1,29 +1,23 @@
-// models/Message.js
-
 const mongoose = require('mongoose');
 
-// Define the schema for storing messages
 const messageSchema = new mongoose.Schema({
-  messageId: { 
-    type: String, 
-    required: true, 
-    unique: true  // Ensure each message has a unique ID
+  messageId: {
+    type: String, // or Number, depending on your use case
+    required: true, // Make sure this is required if you're using it
   },
-  text: { 
-    type: String, 
-    required: true 
+  text: {
+    type: String,
+    required: true, // Text field remains required
   },
-  processed: { 
-    type: Boolean, 
-    default: false  // To track if the message has been processed
+  username: {
+    type: String,
   },
-  timestamp: { 
-    type: Date, 
-    default: Date.now // Automatically set the timestamp of the message
+  timestamp: {
+    type: Date,
+    default: Date.now,
   }
 });
 
-// Create the model using the schema
 const Message = mongoose.model('Message', messageSchema);
 
-module.exports = Message;  // Export the model so it can be used in other files
+module.exports = Message;

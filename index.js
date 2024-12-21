@@ -1,4 +1,4 @@
-const getquiz = require('./controls/Callgpt')
+
 const {getSeparated,postpoll} = require('./controls/utills')
 let express = require('express')
 let app = express()
@@ -41,15 +41,18 @@ async function processQueue() {
 }
 app.post('*',async function (req,res) {
   let obj = req.body
+  console.log(req.body)
   if(obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && username.includes(req.body.message.from.username) && obj.message.chat.type == 'private'){
     
     messageQueue.push(obj)
     processQueue()
   }
   // getquiz().then((res)=>console.log(res))
-  res.send('file a report')
+  res.status(200).send('file a report')
 })
-
+app.get('*',async function (req,res) {
+  res.status(200).send('working on it')
+})
 
 app.listen(port,()=>{
   console.log(`starting at port ${port}`)

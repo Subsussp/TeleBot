@@ -1,73 +1,67 @@
-// api/bot.js
 const axios = require('axios');
 const mongoose = require('mongoose');
-const Message = require('../message.js');
+const Message = require('../models/Message'); // Import the Message model
 const { getSeparated, postpoll } = require('../controls/utills');
-require('dotenv').config()
-mongoose.set('strictQuery', true);  // or true depending on your preference
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('MongoDB connection error:', err));
 
-let isProcessing = false;
+async function processMessages() {
+  // Fetch the first pending message from the database
+  const message = await Message.findOne({ status: 'pending' });
 
-async function processQueue() {
-  if (isProcessing) return; // Prevent multiple processing
-  isProcessing = true;
+  if (message) {
+    // Mark the message as processed to avoid processing it multiple times
+    await Message.updateOne({ _id: message._id }, { $set: { status: 'processed' } });
 
-  // Get unprocessed messages from MongoDB
-  const messages = await Message.find({ processed: false }).limit(10); // Limit the number of messages to process at once
-
-  for (const message of messages) {
-    let data = message.text;
-
-    // Check for number increment or reset
-    let numbers;
-    if ((numbers !== undefined && data.indexOf(`${numbers + 1}.`) === -1) && !/^[^\d]*1\.(?!\d)/.test(data.substr(0, 60))) {
-      continue; // Skip processing this message if it's out of order
-    } else if (/^[^\d]*1\.(?!\d)/.test(data.substr(0, 60))) {
-      numbers = null; // Reset numbers
-    }
-
-    // Separate questions and answers
-    let array = getSeparated(data, numbers);
-    let questions = array[0];
-    let answers = array[1];
-    numbers = numbers ? array[2] : questions.length;
-
-    // Post each question with a delay
-    for (let i = 0; i < questions.length; i++) {
-      await new Promise(resolve => setTimeout(async () => {
-        await postpoll(questions[i], answers[i]); // Assuming postpoll sends the question and answer somewhere
-        resolve();
-      }, 3000));
-    }
-
-    // Mark the message as processed
-    await Message.findByIdAndUpdate(message._id, { processed: true });
+    // Process the message
+    await processMessage(message);
+  } else {
+    console.log('No pending messages to process');
   }
+}
 
-  isProcessing = false;
+async function processMessage(message) {
+  let numbers;
+  let data = message.messageText;
+
+  // Process the questions and answers
+  let array = getSeparated(data, numbers);
+  let questions = array[0];
+  let answers = array[1];
+  numbers = numbers ? array[2] : questions.length;
+
+  // Send each question
+  for (let i = 0; i < questions.length; i++) {
+    await new Promise(resolve =>
+      setTimeout(async () => {
+        await postpoll(questions[i], answers[i]);
+        resolve();
+      }, 3000)  // Delay between each question
+    );
+  }
 }
 
 module.exports = async (req, res) => {
   let obj = req.body;
 
-  // Ensure message is valid and from an allowed user
   if (obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && ['SofaAwAs', 'YoussefE16', 'YMYquestions'].includes(obj.message.from.username) && obj.message.chat.type === 'private') {
-    
-    // Save message to the database
-    const existingMessage = await Message.findOne({ messageId: obj.message.message_id });
-    if (!existingMessage) {
-      await Message.create({
-        messageId: obj.message.message_id,
-        text: obj.message.text,
-      });
-    }
+    // Save the message to the database
+    const newMessage = new Message({
+      messageId: obj.message.message_id.toString(),
+      messageText: obj.message.text,
+      username: obj.message.from.username,
+      chatType: obj.message.chat.type
+    });
 
-    // Start processing the queue (if not already processing)
-    await processQueue();
+    await newMessage.save(); // Save the message to the DB
+    console.log('Message saved to DB');
+
+    // Process pending messages
+    await processMessages();
   }
 
-  res.status(200).send('Message received and processing started...');
+  res.status(200).send('Message received and queued for processing');
 };

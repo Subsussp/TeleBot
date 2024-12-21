@@ -45,23 +45,24 @@ async function processMessage(message) {
 }
 
 module.exports = async (req, res) => {
-  let obj = req.body;
+  const obj = req.body;
 
-  if (obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && ['SofaAwAs', 'YoussefE16', 'YMYquestions'].includes(obj.message.from.username) && obj.message.chat.type === 'private') {
-    // Save the message to the database
-    const newMessage = new Message({
-      messageId: obj.message.message_id.toString(),
-      messageText: obj.message.text,
-      username: obj.message.from.username,
-      chatType: obj.message.chat.type
-    });
+  // Ensure the 'message' and 'text' fields are present before saving
+  if (obj && obj.message && obj.message.text) {
+    try {
+      const newMessage = new Message({
+        text: obj.message.text,
+        username: obj.message.from.username,
+      });
 
-    await newMessage.save(); // Save the message to the DB
-    console.log('Message saved to DB');
-
-    // Process pending messages
-    await processMessages();
+      await newMessage.save();
+      res.status(200).send('Message saved successfully');
+    } catch (error) {
+      console.error('Error saving message:', error);
+      res.status(500).send('Error saving message');
+    }
+  } else {
+    res.status(400).send('Text field is required');
   }
-
-  res.status(200).send('Message received and queued for processing');
 };
+

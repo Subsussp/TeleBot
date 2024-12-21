@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
   let obj = req.body;
   if (obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && ['SofaAwAs', 'YoussefE16', 'YMYquestions'].includes(req.body.message.from.username) && obj.message.chat.type === 'private') {
     messageQueue.push(obj);
-    await processQueue();
+    processQueue();
   }
   res.status(200).send('file a report');
 };

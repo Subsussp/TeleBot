@@ -3,7 +3,7 @@ const axios = require('axios');
 const mongoose = require('mongoose');
 const Message = require('../message.js');
 const { getSeparated, postpoll } = require('../controls/utills');
-mongoose.set('strictQuery', false);  // or true depending on your preference
+mongoose.set('strictQuery', true);  // or true depending on your preference
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });

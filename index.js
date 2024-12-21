@@ -1,4 +1,4 @@
-const getquiz = require('./controls/Callgpt')
+
 const {getSeparated,postpoll} = require('./controls/utills')
 let express = require('express')
 let app = express()
@@ -39,10 +39,9 @@ async function processQueue() {
   }
   isProcessing = false;
 }
-app.post('*',async function (req,res) {
+app.post('/bot',async function (req,res) {
   let obj = req.body
   if(obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && username.includes(req.body.message.from.username) && obj.message.chat.type == 'private'){
-    
     messageQueue.push(obj)
     processQueue()
   }

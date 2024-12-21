@@ -1,6 +1,6 @@
 const axios = require('axios');
 const mongoose = require('mongoose');
-const Message = require('../models/Message'); // Import the Message model
+const Message = require('../message'); // Import the Message model
 const { getSeparated, postpoll } = require('../controls/utills');
 
 // MongoDB connection

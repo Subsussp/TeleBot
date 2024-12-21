@@ -44,13 +44,15 @@ async function processMessage(message) {
   }
 }
 
+
 module.exports = async (req, res) => {
   const obj = req.body;
 
-  // Ensure the 'message' and 'text' fields are present before saving
-  if (obj && obj.message && obj.message.text) {
+  // Ensure the required fields are provided
+  if (obj && obj.message && obj.message.text && obj.message.messageId) {
     try {
       const newMessage = new Message({
+        messageId: obj.message.messageId, // Provide the messageId
         text: obj.message.text,
         username: obj.message.from.username,
       });
@@ -62,7 +64,7 @@ module.exports = async (req, res) => {
       res.status(500).send('Error saving message');
     }
   } else {
-    res.status(400).send('Text field is required');
+    res.status(400).send('Message text and messageId are required');
   }
 };
 

@@ -28,7 +28,7 @@ async function processQueue() {
       await new Promise(resolve => setTimeout(async () => {
         await postpoll(questions[i], answers[i]);
         resolve();
-      }, 3000));
+      }, 2000));
     }
   }
   isProcessing = false;
@@ -36,10 +36,9 @@ async function processQueue() {
 
 module.exports = async (req, res) => {
   let obj = req.body;
-  console.log(obj)
   if (obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && ['SofaAwAs', 'YoussefE16', 'YMYquestions'].includes(req.body.message.from.username) && obj.message.chat.type === 'private') {
     messageQueue.push(obj);
-    processQueue();
+    await processQueue();
   }
   res.status(200).send('file a report');
 };

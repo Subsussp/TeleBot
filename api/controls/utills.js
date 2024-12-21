@@ -1,4 +1,4 @@
-const { default: axios } = require("axios")
+const { default: axios } = require("../node_modules/axios/index.d.cts")
 
 let chocies = 'abcd'
 let Cchocies = 'ABCD'

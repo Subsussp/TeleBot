@@ -39,7 +39,7 @@ async function processQueue() {
   }
   isProcessing = false;
 }
-app.post('/bot',async function (req,res) {
+app.post('*',async function (req,res) {
   let obj = req.body
   if(obj.hasOwnProperty('message') && obj.message.hasOwnProperty('text') && username.includes(req.body.message.from.username) && obj.message.chat.type == 'private'){
     messageQueue.push(obj)

@@ -44,11 +44,12 @@ async function processMessage(message) {
   }
 }
 
-
 module.exports = async (req, res) => {
   const obj = req.body;
 
-  // Ensure the required fields are provided
+  // Log the request body to check the structure
+  console.log('Request body:', obj);
+
   if (obj && obj.message && obj.message.text && obj.message.messageId) {
     try {
       const newMessage = new Message({
@@ -64,7 +65,7 @@ module.exports = async (req, res) => {
       res.status(500).send('Error saving message');
     }
   } else {
-    res.status(400).send('Message text and messageId are required');
+    console.log('Bad Request: Missing messageId or text');
+    res.status(400).send('Bad Request: Missing messageId or text');
   }
 };
-
